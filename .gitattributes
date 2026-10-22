@@ -1,0 +1,3 @@
+* text=auto eol=lf
+# Integrity-checked Tide SDK relay: preserve bytes even on other platforms.
+public/tide_dpop_auth.html -text

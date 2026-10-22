@@ -1,0 +1,10 @@
+# Tide's enclave checks these exact relay bytes. Never reformat this asset.
+public/tide_dpop_auth.html
+node_modules/
+.next/
+.tide-pack/
+.data/
+data/
+redo.md
+mota.md
+package-lock.json
