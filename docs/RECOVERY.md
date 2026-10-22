@@ -1,6 +1,6 @@
-# Preserve and diagnose an existing Tide realm
+# Preserve and replace a Tide realm safely
 
-Use repair first. A local user record, a linked Tide identity and a remote licensed allocation are separate objects. Deleting a realm, user or Docker volume does not establish that an allocation was released. A new container cannot resolve a remote quota or outage.
+Inspect and preserve the existing realm first. A local user record, a linked Tide identity and a remote licensed allocation are separate objects. Deleting a realm, user or Docker volume does not establish that an allocation was released. A new container alone does not establish licensed capacity or resolve an external outage.
 
 ## Read-only checks
 
@@ -16,7 +16,7 @@ Compare remote usage with the separate realm inventory. The APIs above do not ex
 
 ## Consistent backups and rollback
 
-Store recovery material under Git-ignored `.data/reset-backups/`, directories mode 700 and files mode 600. Docker inspection and filesystem exports contain secrets: archive them privately and do not paste them into issues or terminal transcripts.
+Store recovery material under Git-ignored `.data/old-tide-backup/` (or an existing `.data/reset-backups/`), directories mode 700 and files mode 600. Docker inspection and filesystem exports contain secrets: archive them privately and do not paste them into issues or terminal transcripts.
 
 For this development image, H2 is bind-mounted at `data/` → `/opt/keycloak/data/h2`. Stop **only** `cloudguard-tidecloak` gracefully before copying it. Do not copy a running H2 directory as a consistency guarantee. Capture:
 
@@ -48,3 +48,23 @@ Test DNS A/AAAA and verified HTTPS from the host, the existing container and the
 Preserve the enrolled first admin. Reuse the existing unlinked second-admin record. Keep one-time links in private local files and have each independent owner complete their own identity, password and recovery. Create the third admin and Employee only once prerequisites and available capacity are established. Review any existing pending Employee creation instead of submitting a duplicate.
 
 Admin role grants and policy regeneration require genuine enclave authorization. Do not auto-approve pending requests with master credentials. Verify three distinct enrolled admin-role holders, the signed policy and actual threshold on a live governed request. Employee starts with viewer and no effective operator/management privileges. Use [the demo acceptance and recording script](DEMO_SCRIPT.md) only after these conditions are met.
+
+## Stage an authorized replacement
+
+When a replacement is explicitly authorized, keep the original container and offline backup. Use an independent database, random private bootstrap credentials, a different container name and a loopback-only staging port. Do not copy the old vendor keys, database, adapter or browser sessions into it. Read the current official Quickstart, verify the official image and test DNS/verified HTTPS from the new container.
+
+Run the supported realm/licence provisioning once using the owner's supplied licence email and accepted Terms. Inspect the actual remote status, capacity and usage before preparing enrollment. A newly issued licence is separate from reclaiming the original allocations. If issuance fails or capacity is insufficient, preserve the result and stop; do not cycle vendors, accounts or subscriptions.
+
+For this local staging run, the official service issued an active Free licence with capacity 5, usage 0 and 5 available at inspection. Four authorized local records and private action links are prepared. This establishes available licensed capacity; it does not establish four enrolled identities. The original service and application adapter remain in place. No old allocations have been identified or released.
+
+Complete the bootstrap in the supported order:
+
+1. Import the complete realm/client configuration, enable Tide attestation and IGA once, and complete only reviewed FirstAdmin bootstrap changes while there are no admin-role holders.
+2. Prepare the four authorized users and action links. Each owner enrolls a separate Tide identity in their own private browser profile; passwords and recovery remain human-only. Keep Employee viewer-only.
+3. Inspect and complete the first admin's linkage changes in FirstAdmin mode. Set the Tide IdP `CustomAdminUIDomain` to the staged realm's built-in Tide Console URL and call `vendorResources/sign-idp-settings`.
+4. Grant the enrolled first admin the genuine `realm-management/tide-realm-admin` client role **last**. Its commit switches to MultiAdmin. Stop server-driven approval at this boundary. Additional admin grants and related policy regeneration require the actual admins' own browser/enclave signatures.
+5. Verify three distinct enrolled admin-role holders and a signed policy threshold of two, then test the actual pending → one approval insufficient → independent second approval applies scenario. Before the first admin grant, the signed admin-policy endpoint may return 404; that is an incomplete bootstrap, not proof of a broken licence.
+
+Keep a vendor-exported candidate adapter in private staging. Check its issuer, client, embedded public keys and signed origin against the new realm; verify code/PKCE, exact localhost app origin, redirect URIs, strict DPoP and audience configuration. Run the realm/license diagnostics with the staging environment explicitly selected. A doctor run against a candidate adapter and the existing application's relay checks wiring and realm state; it does not prove that the app has switched or that a human login succeeded.
+
+Test candidate sign-in and console access with the owners before cutover. During cutover, stop the application, preserve its old adapter/environment, install the genuine candidate configuration and rebuild/restart. Then verify actual callback, logout, Tide-issued JWT/DPoP and the Employee 403 → governed grant → fresh claims → 200 flow. Retain the original container, data and configuration until live acceptance passes. If acceptance fails, stop the app, restore the saved adapter/environment and rebuild/restart against the preserved original instance. Restoring the database is unnecessary for an adapter-only rollback.

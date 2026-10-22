@@ -7,12 +7,12 @@
 - Three different enrolled Tide realm administrators (A, B, C), each controlled independently; separate browser profiles/windows.
 - A separate enrolled Employee with viewer access and initially no `infra-operator`.
 - Licensed Tide realm, QEA enabled, `iga.attestor=tide`, effective threshold visibly confirmed as **2 with 3 enrolled admin-role holders**.
-- CloudGuard at http://localhost:3000 and genuine console at http://localhost:8080/realms/cloudguard/tide-console/.
+- CloudGuard at http://localhost:3000 and the genuine Tide Console for the realm selected by the app adapter. The original local service uses port 8080; the isolated candidate uses 8081. Confirm both target the same realm before filming.
 - Employee DevTools Network tab filtered to `restart`; keep Authorization/DPoP headers closed. Capture status and sanitized response only. Disable notifications and avoid recording one-time links, personal credentials or raw tokens.
 
 Pre-enroll and rehearse first. Recording is not the time to create accounts or activate the licence. Check that the employee is a non-admin and that no unrelated request is already approved. Keep each independent person's session ready, without sharing their credentials.
 
-Run `npm run check:realm` and `npm run check:license` during preparation. A full remote allocation reading requires supported capacity recovery before further enrollment; local user deletion or realm reset is not a demonstrated remedy. Follow [RECOVERY.md](RECOVERY.md). The current deployment has one enrolled administrator and has not passed the live acceptance table below. Keep the initial Employee viewer-only until filming the genuine governed grant. Browser-profile directories are session storage and must stay private and Git-ignored.
+Run `npm run check:realm` and `npm run check:license` during preparation. A full remote allocation reading requires supported capacity recovery before further enrollment; local user deletion or realm reset is not a demonstrated remedy. Follow [RECOVERY.md](RECOVERY.md). The original deployment has one enrolled administrator; a separately licensed candidate has four local records awaiting human enrollment. The app still uses the original adapter, and neither environment has passed the live acceptance table below. Keep the initial Employee viewer-only until filming the genuine governed grant. Browser-profile directories are session storage and must stay private and Git-ignored.
 
 ## Storyboard
 
