@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "demo": "node scripts/demo.mjs",
+    "test:demo": "playwright test --config=playwright.demo.config.ts",
+    "record:demo": "node scripts/record-demo.mjs",
     "dev": "node scripts/dev.mjs",
     "build": "next build --webpack",
     "start": "node scripts/dev.mjs --production",
@@ -11,7 +14,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:browser": "playwright test",
-    "check": "npm run lint && npm run typecheck && npm test && npm run build && npm run test:integration && npm run test:browser",
+    "check": "npm run lint && npm run typecheck && npm test && npm run build && npm run test:integration && npm run test:browser && npm run test:demo",
     "stop": "node scripts/stop.mjs",
     "export:adapter": "node --env-file=.env scripts/export-adapter.mjs",
     "check:realm": "node --env-file=.env scripts/check-realm.mjs",

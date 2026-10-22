@@ -1,3 +1,11 @@
+# Submission demo quick start
+
+The published video uses the server-enforced TideCloak Protection Simulation. Run `npm ci`, then `npm run demo`, and open http://localhost:3001/demo. No licence, Docker, email, or `.env` is required. Use isolated browser sessions for Employee, Admin A and Admin B. The simulator does not provide Tide cryptographic guarantees. See the repository README for the workflow and production-build commands.
+
+## Optional live TideCloak deployment
+
+The instructions below concern the preserved live integration. Live enrollment and network signing can fail during the official network-load incident; they are not required to run the submitted simulation. Never reset existing realms to try to repair remote licensing.
+
 # Reproducible local setup
 
 Use Node >=20.19, npm, Git, Docker Engine/Compose, curl, jq, and an Internet connection to Tide's network. Run commands at the repository root. Keep port 3000 for CloudGuard and 8080 for TideCloak. The frontend origin is **http://localhost:3000**, not 127.0.0.1: Tide's signed origin capability and redirect registration must match.
@@ -35,7 +43,7 @@ npm run check:license
 
 These are local operator commands. Administrator tokens exist only in command memory and are never returned to the browser. `check:realm` is read-only. It paginates users, checks effective roles (including inherited roles), requires both the Tide user attribute and an actual Tide IdP link for enrollment, and detects repeated admin identities without printing identifiers or emails. For the suggested `cloudguard-employee` username, it checks enrollment, viewer access, separation from admins and absence of infrastructure/operator or realm-management privileges. It also reports the stored signed admin-policy threshold and pending-request count. `identityAndRolePreconditionsMet` covers identity/role prerequisites only; **it does not mark H2 complete or prove live quorum enforcement**. Verify that behavior in an actual governed request.
 
-`check:license` reports remote license status/capacity/usage separately from local users. It prints only allowlisted fields; failed or empty readings remain unknown. See [recovery and backup guidance](RECOVERY.md) before any cleanup, container replacement or reset. For an authorized isolated replacement, follow its staging and cutover sequence; do not run initial setup over an existing database or replace the app adapter before candidate verification. For a new installation only, optional `TIDECLOAK_DNS` configures tested resolver IPs per container without changing global Docker settings.
+`check:license` reports remote license status/capacity/usage separately from local users. It prints only allowlisted fields; failed or empty readings remain unknown. See [recovery and backup guidance](RECOVERY.md) before any cleanup, container replacement or reset. Do not run initial setup over an existing database or replace an app adapter before independent live verification. For a new installation only, optional `TIDECLOAK_DNS` configures tested resolver IPs per container without changing global Docker settings.
 
 The vendor adapter includes embedded public JWKS and signed `client-origin-auth-*` capabilities. CloudGuard serves only allowlisted public SDK inputs at `/api/config`. Never use a confidential client or put secrets in this adapter. Never replace it with a handcrafted mock or a generic Keycloak adapter.
 
@@ -60,9 +68,9 @@ Console: http://localhost:8080/realms/cloudguard/tide-console/
 4. Confirm all three distinct people are enrolled and hold the admin role. Check that `isIGAEnabled` is true and `iga.attestor` is `tide`. Observe the effective threshold in the console; do not infer successful enforcement from the intended UI illustration.
 5. Create Employee in People and complete separate Tide enrollment. Default roles include `viewer` and Tide/app prerequisites. Ensure the Employee has no `infra-operator`, no admin role, and no composite/default role granting operator indirectly.
 6. Confirm the `cloudguard-client` client uses standard code flow, is public, has password grants disabled, includes an audience mapper for itself, has `dpop.bound.access.tokens=true`, the exact localhost origin, `/auth/redirect`, and `/silent-check-sso.html`. Existing-client changes are governed and may need enclave approvals.
-7. Follow [DEMO_SCRIPT.md](DEMO_SCRIPT.md). Grant the **realm** role `infra-operator`, not a same-name client role. A viewer restart must return 403; one approval at a verified threshold of two must not grant the role; independent second approval applies it; fresh employee claims must enable a 200 synthetic restart.
+7. In the genuine console, grant the **realm** role `infra-operator`, not a same-name client role. A viewer restart must return 403; one approval at a verified threshold of two must not grant the role; independent second approval applies it; fresh employee claims must enable a 200 synthetic restart.
 
-CloudGuard intentionally links to Tide Console instead of mirroring approval status with privileged credentials. No application endpoint can grant roles, approve requests, or change governance policy.
+CloudGuard intentionally links to Tide Console instead of mirroring approval status with privileged credentials. No live application endpoint can grant roles, approve requests, or change governance policy. The separate `/api/demo/*` endpoints only modify synthetic demo state.
 
 ## Stop and restart without losing Tide enrollment
 

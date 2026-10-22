@@ -23,7 +23,8 @@ export default function Home() {
       <header className="landing-nav">
         <Brand />
         <nav>
-          <Link href="/dashboard">Workspace</Link>
+          <Link href="/demo">Protection simulation</Link>
+          <Link href="/dashboard">Live workspace</Link>
           <Link href="/governance">How it works</Link>
           <a
             href="https://github.com/ndhau1706/HCMUS_SGS_Fourdogs_C2"

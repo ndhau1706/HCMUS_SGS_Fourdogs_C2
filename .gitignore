@@ -21,3 +21,13 @@ data/keycloakdb*
 
 /next-env.d.ts
 /data/*.tmp
+
+# Generated tooling and temporary exports
+/dist/
+/build/
+.cache/
+__pycache__/
+.pytest_cache/
+.venv/
+*.tmp
+*.swp

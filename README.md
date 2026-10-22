@@ -1,108 +1,115 @@
-# Project overview
+# CloudGuard
 
-**CloudGuard — Zero-Trust Infrastructure Governance** lets teams share infrastructure operations through TideCloak-governed privileges and server-verified access.
+CloudGuard lets teams share infrastructure operations while requiring independent approval before anyone gains operating privileges.
 
-### What new product, service, experience or way of working are you proposing? What makes your idea distinctive?
+[Watch the CloudGuard Demo](./demo.mp4) · [Run the prototype](#running-the-application)
 
-A shared operations workspace where becoming an infrastructure operator requires genuine quorum governance, allowing collaborating teams to delegate work without giving one realm administrator unilateral privilege-granting authority.
+## Project overview
 
-### What is difficult, risky or impossible today because trust, privacy or security gets in the way? Explain what becomes possible when that constraint is removed.
+### 1. Vision & originality
 
-Ordinary IAM administrators can rewrite who holds operating privileges. Governed role assignment enables shared operations while reducing that concentration of authority within the enrolled realm-admin boundary.
+A shared infrastructure workspace where access to sensitive operations is a governed decision: two of three administrators must approve an employee’s privilege request.
 
-### Who would benefit, and how would their lives or work improve? Give a concrete example of why this matters.
+### 2. Trust constraint insight
 
-Platform teams and partner organizations could delegate incident response with shared oversight: an employee gains operating access only after independent administrators approve, rather than trusting one privileged account.
+Ordinary IAM concentrates permission-changing power in an administrator. That account can become a shortcut around shared oversight. CloudGuard demonstrates how requiring independent authority can make joint operations credible.
 
-### How does your application use TideCloak, and how does that integration help enable your idea? Connect the technology to the possibility you are demonstrating.
+### 3. Value & impact
 
-TideCloak supplies identity, signed tokens and QEA-governed realm roles. The API verifies pinned keys, issuer, client/audience, expiry, DPoP and infra-operator. Three enrolled administrators are intended to require two approvals; verify the effective policy in Tide Console. Master administration remains outside QEA.
+Platform teams and partner organizations can delegate incident response with shared oversight. For example, an employee can restart a gateway only after two administrators approve operating access; one compromised approver remains insufficient under the modeled policy.
 
-### What does your prototype demonstrate today? Describe the key interaction judges should look for.
+### 4. Why TideCloak matters
 
-Four pages, three synthetic resources, protected restarts and logs. Automated tests cover viewer rejection and operator success. A QEA realm and its first enrolled admin are verified; live multi-admin quorum verification remains pending. Target: 403 → genuine independent approvals → fresh employee claims → 200. No genuine demo MP4 is included yet.
+The live integration preserves TideCloak sign-in, server-verified JWTs and DPoP. Tide’s Emergent Authority would cryptographically govern the privilege grant through independent enclave approvals and ORK-backed proofs. The submitted demo uses a clearly labeled, server-enforced simulation under [Tide’s official network-load allowance](https://tide.org/unlocked/#plan-c). The simulator trusts its application host and does not implement Tide’s cryptographic guarantees.
 
----
+### 5. Prototype & storytelling
 
-## Requirements and quick start
-
-Node.js ≥20.19, npm, Docker Engine, curl, jq, and access to Tide's network. Commands run from this repository's root.
-
-```bash
-npm ci
-cp .env.example .env
-chmod 600 .env
-# Edit .env: choose a strong master password, enter your licence email,
-# and set TIDE_TERMS_ACCEPTED=yes only after accepting https://tide.org/legal.
-npm run init
-# Complete the genuine Tide enrollment link; let bootstrap finish.
-npm run dev
-```
-
-Open **http://localhost:3000**. Keep the exact origin: the client includes signed origin capabilities. Stop with `npm stop` or Ctrl+C for the app terminal. See [complete setup and restart instructions](docs/SETUP.md), including Docker socket diagnosis and preserving existing data.
-
-Without a genuine adapter, the public UI renders an explicit setup notice and protected APIs fail closed. No mock login exists. For a production build: `npm run build && npm start`.
-
-## Authentication and governance
-
-The official Tide Next.js provider performs authorization-code/PKCE authentication with strict DPoP. The public client adapter is exported through Tide's vendor endpoint and stored locally in `data/tidecloak.json`. Only allowlisted public SDK inputs are served; operator secrets never reach the browser.
-
-Default user privileges include the realm role `viewer`. Only the verified realm role `infra-operator` permits `POST /api/resources/{id}/restart`. The other authenticated APIs expose resources, synthetic health, verified session metadata and shared application activity. No application endpoint grants roles or approves changes.
-
-Provision **three separate enrolled people** holding `realm-management/tide-realm-admin`, plus an Employee. In the [real Tide Console](http://localhost:8080/realms/cloudguard/tide-console/), propose the Employee's infra-operator grant and independently approve through QEA. Confirm the actual threshold and that one approval remains insufficient. Obtain a fresh employee token and repeat the restart. Follow [setup](docs/SETUP.md) and the [timed demo and manual acceptance script](docs/DEMO_SCRIPT.md).
-
-## Workspace
-
-| Page | Implemented behavior |
-|---|---|
-| `/` | Product explanation, real Tide sign-in, workspace navigation |
-| `/dashboard` | Protected fleet data, resource search, synthetic telemetry, health/details, API-backed restart, denial/success messages |
-| `/governance` | Server-verified identity/realm roles, access status, fresh-login guidance, genuine console link; intended quorum clearly separated from live state |
-| `/activity` | Shared process activity, outcome filters, JSON export; distinct from Tide's QEA audit |
-
-All servers and operations are synthetic. No SSH, cloud account, database operation, or host restart occurs. UI access labels do not authorize the backend.
+Watch Employee receive HTTP 403, request infra-operator, and remain blocked after Admin A approves. A duplicate approval returns 409 without increasing the count. Admin B approves from a separate browser session, satisfying 2-of-3 governance. The backend grants the role, permits the synthetic restart and records the audit trail. No real infrastructure is operated.
 
 ## Architecture
 
-```mermaid
-flowchart LR
-  Humans[Independent realm administrators] -->|Enclave approvals| QEA[TideCloak QEA]
-  QEA -->|Governed role assignment| Identity[Tide identity and token issuance]
-  Employee -->|Code + PKCE / DPoP| Identity
-  Identity -->|Fresh signed access token| UI[Next.js workspace]
-  UI -->|Official secureFetch + proof| API[JWT + audience + DPoP + realm-role checks]
-  API --> Fleet[Synthetic process state]
-  API --> Logs[Local application activity]
+Next.js 16, React, TypeScript, Tailwind CSS and Lucide. Server route handlers enforce permissions; the UI displays actual HTTP results.
+
+- `/demo` → isolated `/api/demo/*` → synthetic session, quorum policy, resource and audit state.
+- Live workspace → official Tide Next.js SDK → JWT, issuer, audience, expiry, DPoP and realm-role verification → synthetic resource store.
+
+Demo state is bounded, in memory and shared by one application process. A restart resets it. The repository includes the complete application, dependency lockfile, focused authorization tests and reproducible recording script.
+
+## Features
+
+- Employee viewer baseline, explicit privilege requests and two distinct administrator approvals.
+- Server rejection before quorum, duplicate-vote rejection and immediate role readback after authorization.
+- Synthetic resource operations and an audit journal reflecting actual state transitions.
+- Preserved live infrastructure, governance and activity pages, including strict JWT/DPoP enforcement.
+
+## TideCloak Integration / Simulation
+
+**Submission mode: TideCloak Protection Simulation.** Synthetic identities are selected without real credentials and receive separate HttpOnly browser sessions. They model identities, not proof of distinct humans. Roles and approvals are enforced by the demo backend. Direct client role assertions are ignored.
+
+Demo endpoints are disabled unless the server explicitly sets `CLOUDGUARD_DEMO_MODE=true`. Demo sessions never authenticate live APIs. `npm run demo` enables only its own process. No Tide licence or Docker instance is required for the submission demo.
+
+The real integration remains in `src/lib/auth`, `src/app/providers.tsx` and the live API routes. Live privilege grants belong in Tide Console, with approvals sent directly from each administrator’s enclave session. See [live setup](docs/SETUP.md) and [security boundaries](docs/SECURITY.md). Live 2-of-3 cryptographic QEA is not claimed as verified.
+
+## Trust and Authorization Workflow
+
+1. Employee signs in as a synthetic viewer; restart returns **403**.
+2. Employee requests infra-operator. The server creates a pending grant.
+3. Admin A approves. **1/2** remains pending; restart still returns **403**.
+4. Admin A repeats approval. **409**; the count stays one.
+5. Admin B approves in another session. **2/2**, from three eligible identities, authorizes the grant.
+6. Employee refreshes role state and retries. **200**; the audit records the grant and restart.
+
+The simulation protects this workflow through backend logic, not cryptographic separation from the application operator. The live Tide design adds that external trust boundary within its documented scope.
+
+## Installation
+
+Requires Node.js ≥20.19 and npm. From this repository:
+
+```bash
+npm ci
 ```
 
-Source: `src/app` pages and route handlers, `src/components` UI, `src/lib/auth` token/proof enforcement, `src/lib/store.ts` bounded synthetic state and logs. `scripts` contains the adapted official bootstrap and local operator diagnostics. Tailwind CSS, shadcn-style Radix/CVA Button, Lucide icons, TypeScript, Next.js, React, official Tide SDKs and jose form the stack. Dependencies are locked in `package-lock.json`.
+No credentials or environment file are needed for the simulation. For optional live mode, copy `.env.example` to private `.env`, configure your own deployment, and follow [setup](docs/SETUP.md). Never commit credentials or a local Tide adapter.
 
-## Testing and current status
+## Running the Application
+
+```bash
+npm run demo
+```
+
+Open **http://localhost:3001/demo**. Use separate browser profiles/private sessions for Employee, Admin A and Admin B. An administrator can select “Reset synthetic demo” to restore the viewer baseline. Stop the app with Ctrl+C.
+
+For the production-built simulation:
+
+```bash
+npm run build
+npm run demo -- --production
+```
+
+For the separately configured live workspace: `npm run dev`, or `npm run build` followed by `npm start`, at http://localhost:3000.
+
+Validation:
 
 ```bash
 npm run lint
-npm run typecheck
 npm test
 npm run build
+npm run typecheck
 npm run test:integration
 npm run test:browser
-npm audit --omit=dev
+npm run test:demo
 ```
 
-Tests exercise the real official verifier and signed ephemeral test JWT/DPoP inputs, role spoofing rejection, 401/403/503 behavior, resource validation, idempotency, cooldown and logs. They are **not proof of live Tide issuance or QEA**. Browser tests cover navigation, mobile layout, unauthenticated protected endpoints and the exact official DPoP relay. Playwright can use local Chrome or installed Chromium.
+## Demo Video
 
-Tide MCP v1.9.33 is operational. The preserved original realm has one enrolled administrator and exhausted remote capacity. An isolated replacement has now received an official active Free licence: capacity 5, usage 0, available 5 at inspection. Four local records and private enrollment links are prepared; human enrollment, admin grants and live 2-of-3 acceptance remain pending. CloudGuard still uses the original adapter. Old allocations have not been reclaimed. See [validation evidence](docs/VALIDATION.md) and the [replacement and rollback guide](docs/RECOVERY.md).
+[Watch the CloudGuard Demo](./demo.mp4)
 
-Runtime dependency audit is clean. Five high-severity development-tool findings remain through braces in Next's lint dependency tree, with no fixed current braces version; details in [SECURITY.md](docs/SECURITY.md).
+The video records the running application and real backend workflow using isolated synthetic sessions. It visibly discloses simulation; no Tide signatures are fabricated. To reproduce, start the production-built simulation, then run:
 
-## Security limits
+```bash
+npm run record:demo
+```
 
-Tide protects the governed privilege assignment and token authority, not each simulated restart. The master realm is outside QEA. A compromised app host can replace enforcement or trusted configuration. Existing tokens retain privileges until expiry. Replay/idempotency caches and synthetic state are in memory: use one Node process; restart/multi-instance durability requires a shared atomic store. Logs are application records, not cryptographic evidence. Read the full [trust boundary and limitations](docs/SECURITY.md).
+The recording script requires local Chrome/Chromium and FFmpeg. See the [recording workflow](docs/DEMO_SCRIPT.md).
 
-## Submission assets
-
-The overview above uses the **five exact official prompts** retrieved from [Tide UNLOCKED's public configuration](https://tide.org/unlocked/config.js); it is under 300 words including prompts. Setup is separate.
-
-A genuine MP4 (≤2 minutes, <100 MB) still needs to be recorded and added after the real QEA flow is verified. The [storyboard](docs/DEMO_SCRIPT.md) provides evidence and export requirements. Submit the repository through the [official form](https://forms.gle/HRHYjnqB86j1LFS97); pushing code alone is not submission. Deadline displays conflict across the site's static text and timezone-specific configuration; verify with organizers as described in the demo script.
-
-Original submission repository: **HCMUS_SGS_Fourdogs_C2** — Tide UNLOCKED, RMIT Hackathon 2026, Challenge 2.
+Submit the public repository through the [official Google Form](https://forms.gle/HRHYjnqB86j1LFS97). Publishing to GitHub does not submit the form.

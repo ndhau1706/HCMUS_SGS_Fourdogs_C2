@@ -8,6 +8,7 @@ import {
   useMemo,
 } from "react";
 import dynamic from "next/dynamic";
+import { usePathname } from "next/navigation";
 import {
   useTideCloak,
   type TideCloakContextProviderProps,
@@ -69,6 +70,11 @@ function TideBridge({ children }: { children: React.ReactNode }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 export function Providers({ children }: { children: React.ReactNode }) {
+  const path = usePathname();
+  // The isolated simulation never initializes or impersonates a Tide SDK session.
+  return path === "/demo" ? <>{children}</> : <LiveProviders>{children}</LiveProviders>;
+}
+function LiveProviders({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<{
     config: TideCloakContextProviderProps["config"] | null;
     loading: boolean;

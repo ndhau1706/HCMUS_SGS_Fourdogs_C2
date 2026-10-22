@@ -1,3 +1,15 @@
+# Simulation security boundary
+
+The submission adds an isolated, explicitly enabled `/demo` and `/api/demo/*` simulation. Its backend owns the viewer baseline, request, unique approver set, threshold, role grant, protected operation and audit transitions. The client cannot supply a role or an approval count. Opaque random HttpOnly, SameSite=Strict cookies identify separate synthetic sessions. Mutating endpoints require a matching Origin and JSON. Duplicate principals count once even across multiple sessions. The data is bounded in memory and resets on process restart.
+
+Synthetic identity selection is deliberately public: it is not authentication of real people. A person can open multiple synthetic identities. The simulation trusts the application host, provides no ORK signatures and does not make cryptographic quorum claims. Do not deploy it as production access control.
+
+The demo APIs return 404 unless `CLOUDGUARD_DEMO_MODE=true` on the server. The opt-in process started by `npm run demo` uses port 3001; the live API always requires its original JWT/DPoP credentials and ignores demo cookies. Demo state is separate from live resource and audit state.
+
+## Preserved live-mode security design
+
+The remaining notes describe the live Tide integration, not the simulation.
+
 # Security model
 
 CloudGuard demonstrates **governed assignment of infrastructure privileges**, followed by resource-server enforcement. No restart is signed by Tide. Infrastructure, health checks, CPU, memory, uptime, and restart effects are synthetic. The telemetry trace is an illustration, not measured history.
@@ -43,7 +55,7 @@ The HTTP loopback TideCloak container, H2 development storage, permissive ORK fr
 
 Automated tests use ephemeral locally generated keys, the real official verifier, signed DPoP proofs, and actual route handlers. They demonstrate rejection/authorization logic, **not** genuine Tide token issuance or quorum signatures. Browser tests exercise navigation, responsive layout, relay headers, and unauthenticated HTTP rejection.
 
-A genuine local TideCloak instance and QEA realm were provisioned. First-admin enrollment is verified through the actual Tide IdP link and effective role. Further enrollment is blocked by a plan/subscription message and remote service failures; current licence validity is unverified. Fresh application user tokens and the live 2-of-3 acceptance sequence remain unverified. No MP4 or complete live-QEA demonstration is included yet.
+The preserved live deployments have not passed fresh Employee sign-in and the live 2-of-3 acceptance sequence. The submission therefore uses the clearly disclosed server-enforced simulation, whose complete browser workflow is verified separately. The root MP4 records that simulation; it is not evidence of live Tide signatures. See [VALIDATION.md](VALIDATION.md).
 
 ## Dependency audit
 
