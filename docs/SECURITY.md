@@ -5,7 +5,7 @@ CloudGuard demonstrates **governed assignment of infrastructure privileges**, fo
 ## Trust boundary
 
 1. A genuine licensed TideCloak realm uses the Tide identity provider and `iga.attestor=tide`.
-2. QEA captures governed writes. Three separately enrolled `realm-management/tide-realm-admin` holders are intended to require two approvals. The current documented formula is `max(1, floor(0.7 × N))`; **observe the actual threshold on a live request**. Two admins require only one approval under this formula.
+2. QEA captures governed writes. Three separately enrolled `realm-management/tide-realm-admin` holders are intended to require two approvals. The documented projected threshold is `max(1, floor(0.7 × N))`; the live gate uses the signed admin policy, updated when its governed policy-regeneration request commits. **Observe the actual threshold and enforcement on a live request**. Two admins still project to one approval under this formula.
 3. Independent administrators review and authorize in the genuine Tide enclave. There are no approval endpoints, counters, service-account grants, or admin tokens in the CloudGuard browser.
 4. The employee signs in again to obtain a fresh Tide-issued access token with the governed **realm** role `infra-operator`.
 5. Every protected route verifies the token and a fresh sender-bound proof. Only then can a restart mutate the fictional resource state.
@@ -43,7 +43,7 @@ The HTTP loopback TideCloak container, H2 development storage, permissive ORK fr
 
 Automated tests use ephemeral locally generated keys, the real official verifier, signed DPoP proofs, and actual route handlers. They demonstrate rejection/authorization logic, **not** genuine Tide token issuance or quorum signatures. Browser tests exercise navigation, responsive layout, relay headers, and unauthenticated HTTP rejection.
 
-A genuine local TideCloak instance and licensed QEA realm were provisioned. First-admin enrollment, fresh user tokens, and the live 2-of-3 acceptance sequence require human interaction and remain unverified until recorded. No MP4 or complete live-QEA demonstration is included yet.
+A genuine local TideCloak instance and QEA realm were provisioned. First-admin enrollment is verified through the actual Tide IdP link and effective role. Further enrollment is blocked by a plan/subscription message and remote service failures; current licence validity is unverified. Fresh application user tokens and the live 2-of-3 acceptance sequence remain unverified. No MP4 or complete live-QEA demonstration is included yet.
 
 ## Dependency audit
 

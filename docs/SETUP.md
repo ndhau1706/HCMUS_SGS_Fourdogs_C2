@@ -32,7 +32,7 @@ npm run export:adapter
 npm run check:realm
 ```
 
-These are local operator commands. Administrator tokens exist only in command memory and are never returned to the browser. `check:realm` is read-only and reports QEA/attestor, required role existence, enrolled admin-holder counts and pending-request counts. Its counts **do not** establish effective quorum: inspect that in the actual approval request.
+These are local operator commands. Administrator tokens exist only in command memory and are never returned to the browser. `check:realm` is read-only. It paginates users, checks effective roles (including inherited roles), requires both the Tide user attribute and an actual Tide IdP link for enrollment, and detects repeated admin identities without printing identifiers or emails. For the suggested `cloudguard-employee` username, it checks enrollment, viewer access, separation from admins and absence of infrastructure/operator or realm-management privileges. It also reports the stored signed admin-policy threshold and pending-request count. `identityAndRolePreconditionsMet` covers identity/role prerequisites only; **it does not mark H2 complete or prove live quorum enforcement**. Verify that behavior in an actual governed request.
 
 The vendor adapter includes embedded public JWKS and signed `client-origin-auth-*` capabilities. CloudGuard serves only allowlisted public SDK inputs at `/api/config`. Never use a confidential client or put secrets in this adapter. Never replace it with a handcrafted mock or a generic Keycloak adapter.
 
@@ -84,6 +84,8 @@ Synthetic resources, replay/idempotency caches and activity view reset when the 
 - DPoP popup fails: verify relay SHA-256 `9d7844b938f0a2565fa910d3d30e9b8797cbfd6e0b73d59d804169a089aea757`, wildcard rewrite, CSP, popups and browser storage permissions. Keep the SDK asset byte-exact.
 - Build: use the supplied webpack scripts. Tide's package compatibility aliases are in `next.config.ts`.
 - QEA 412: quorum not met. QEA 409 requiring enclave: use independent human approval in the console, never script around it.
+- Blank licensing cards: inspect the supported `vendorResources/getLicenseDetails`, `getSubscriptionStatus` and `billing/summary` responses and matching sanitized TideCloak logs. An empty HTTP 200 response or a failed active-license lookup is not proof of expiry; remote lookup failures can produce empty data. Do not activate another subscription to diagnose it. See [Tide's licensing guide](https://docs.tide.org/Admin/license).
+- ORK errors: compare DNS and HTTPS from the host, the existing container, and the browser. A successful ORK homepage does not prove signing, enrollment or billing routes work. Preserve data before container changes; avoid global Docker DNS changes. Local Network Access permission is a separate browser checkpoint: follow [Tide's browser guide](https://docs.tide.org/FAQ/chromium-error) for the actual enclave origin without disabling security checks.
 
 ## Validation
 

@@ -20,7 +20,7 @@ TideCloak supplies identity, signed tokens and QEA-governed realm roles. The API
 
 ### What does your prototype demonstrate today? Describe the key interaction judges should look for.
 
-Four pages, three synthetic resources, protected restarts and logs. Automated tests cover viewer rejection and operator success. A licensed QEA realm is provisioned; human enrollment and live quorum verification remain pending. Target: 403 → genuine independent approvals → fresh employee claims → 200. No genuine demo MP4 is included yet.
+Four pages, three synthetic resources, protected restarts and logs. Automated tests cover viewer rejection and operator success. A QEA realm and its first enrolled admin are verified; live multi-admin quorum verification remains pending. Target: 403 → genuine independent approvals → fresh employee claims → 200. No genuine demo MP4 is included yet.
 
 ---
 
@@ -91,7 +91,7 @@ npm audit --omit=dev
 
 Tests exercise the real official verifier and signed ephemeral test JWT/DPoP inputs, role spoofing rejection, 401/403/503 behavior, resource validation, idempotency, cooldown and logs. They are **not proof of live Tide issuance or QEA**. Browser tests cover navigation, mobile layout, unauthenticated protected endpoints and the exact official DPoP relay. Playwright can use local Chrome or installed Chromium.
 
-Tide MCP v1.9.33 is operational. The official container is running locally; the licensed CloudGuard realm reports QEA enabled with Tide attestation and required realm roles. First-admin enrollment and the live multi-admin acceptance test remain pending. See [validation evidence](docs/VALIDATION.md).
+Tide MCP v1.9.33 is operational. The official container is running locally; CloudGuard reports QEA enabled with Tide attestation and required realm roles. One enrolled administrator is verified. Further enrollment is blocked by remote signing/licensing failures; current licence validity and live multi-admin acceptance remain unverified. See [validation evidence](docs/VALIDATION.md).
 
 Runtime dependency audit is clean. Five high-severity development-tool findings remain through braces in Next's lint dependency tree, with no fixed current braces version; details in [SECURITY.md](docs/SECURITY.md).
 
