@@ -30,9 +30,12 @@ To re-export the genuine public adapter using the existing operator credentials:
 ```bash
 npm run export:adapter
 npm run check:realm
+npm run check:license
 ```
 
 These are local operator commands. Administrator tokens exist only in command memory and are never returned to the browser. `check:realm` is read-only. It paginates users, checks effective roles (including inherited roles), requires both the Tide user attribute and an actual Tide IdP link for enrollment, and detects repeated admin identities without printing identifiers or emails. For the suggested `cloudguard-employee` username, it checks enrollment, viewer access, separation from admins and absence of infrastructure/operator or realm-management privileges. It also reports the stored signed admin-policy threshold and pending-request count. `identityAndRolePreconditionsMet` covers identity/role prerequisites only; **it does not mark H2 complete or prove live quorum enforcement**. Verify that behavior in an actual governed request.
+
+`check:license` reports remote license status/capacity/usage separately from local users. It prints only allowlisted fields; failed or empty readings remain unknown. See [recovery and backup guidance](RECOVERY.md) before any cleanup, container replacement or reset. For a new installation only, optional `TIDECLOAK_DNS` configures tested resolver IPs per container without changing global Docker settings.
 
 The vendor adapter includes embedded public JWKS and signed `client-origin-auth-*` capabilities. CloudGuard serves only allowlisted public SDK inputs at `/api/config`. Never use a confidential client or put secrets in this adapter. Never replace it with a handcrafted mock or a generic Keycloak adapter.
 

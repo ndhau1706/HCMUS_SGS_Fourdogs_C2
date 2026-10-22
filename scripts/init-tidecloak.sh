@@ -231,7 +231,22 @@ case "$TIDECLOAK_IMAGE" in
          exit 1 ;;
 esac
 
+# Optional, container-scoped resolver list. Leave empty to inherit Docker/host DNS.
+# Applies to new containers only; never recreate an existing realm to set this.
+DNS_ARGS=()
+if [ -n "${TIDECLOAK_DNS:-}" ]; then
+  read -r -a DNS_SERVERS <<< "$TIDECLOAK_DNS"
+  for dns_server in "${DNS_SERVERS[@]}"; do
+    if ! node -e 'process.exit(require("node:net").isIP(process.argv[1]) ? 0 : 1)' -- "$dns_server"; then
+      echo "ERROR: TIDECLOAK_DNS must contain space-separated resolver IP addresses." >&2
+      exit 1
+    fi
+    DNS_ARGS+=(--dns "$dns_server")
+  done
+fi
+
 docker run -d --name cloudguard-tidecloak \
+  "${DNS_ARGS[@]}" \
   -v "$PROJECT_DIR/data:/opt/keycloak/data/h2" \
   -p 127.0.0.1:8080:8080 \
   -e KC_BOOTSTRAP_ADMIN_USERNAME="$KC_BOOTSTRAP_ADMIN_USERNAME" \

@@ -12,6 +12,8 @@
 
 Pre-enroll and rehearse first. Recording is not the time to create accounts or activate the licence. Check that the employee is a non-admin and that no unrelated request is already approved. Keep each independent person's session ready, without sharing their credentials.
 
+Run `npm run check:realm` and `npm run check:license` during preparation. A full remote allocation reading requires supported capacity recovery before further enrollment; local user deletion or realm reset is not a demonstrated remedy. Follow [RECOVERY.md](RECOVERY.md). The current deployment has one enrolled administrator and has not passed the live acceptance table below. Keep the initial Employee viewer-only until filming the genuine governed grant. Browser-profile directories are session storage and must stay private and Git-ignored.
+
 ## Storyboard
 
 | Time | Screen actions and required evidence | Spoken narration |

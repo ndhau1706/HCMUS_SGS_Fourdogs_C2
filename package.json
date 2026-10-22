@@ -15,6 +15,7 @@
     "stop": "node scripts/stop.mjs",
     "export:adapter": "node --env-file=.env scripts/export-adapter.mjs",
     "check:realm": "node --env-file=.env scripts/check-realm.mjs",
+    "check:license": "node --env-file=.env scripts/check-license.mjs",
     "test:integration": "vitest run --config vitest.http.config.mts"
   },
   "dependencies": {
